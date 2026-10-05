@@ -1,1 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      padding: 30px;
+      border-radius: 20px;
+      background: #1e293b;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #94a3b8;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #6366f1;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4f46e5;
+    }
+
+    #result {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 10px;
+      background: #0f172a;
+    }
+
+    #shortUrl {
+      color: #818cf8;
+      word-break: break-all;
+    }
+
+    #error {
+      color: #f87171;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 600px) {
+      form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>🔗 URL Shortener</h1>
+
+    <p>Convert your long URL into a short link.</p>
+
+    <form id="form">
+
+      <input
+        id="url"
+        type="url"
+        placeholder="https://example.com"
+        required
+      >
+
+      <button type="submit">
+        Shorten URL
+      </button>
+
+    </form>
+
+    <div id="error"></div>
+
+    <div id="result">
+
+      <strong>Your Short URL</strong>
+
+      <p>
+        <a id="shortUrl" target="_blank"></a>
+      </p>
+
+      <button id="copy">
+        Copy
+      </button>
+
+    </div>
+
+  </div>
+
+<script>
+
+const form = document.getElementById("form");
+const url = document.getElementById("url");
+const result = document.getElementById("result");
+const shortUrl = document.getElementById("shortUrl");
+const error = document.getElementById("error");
+const copy = document.getElementById("copy");
+
+form.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  error.textContent = "";
+  result.style.display = "none";
+
+  try {
+
+    const response = await fetch("/api", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        url: url.value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Something went wrong");
+    }
+
+    shortUrl.textContent = data.shortUrl;
+    shortUrl.href = data.shortUrl;
+
+    result.style.display = "block";
+
+  } catch (err) {
+
+    error.textContent = err.message;
+
+  }
+
+});
+
+copy.addEventListener("click", async function() {
+
+  await navigator.clipboard.writeText(shortUrl.textContent);
+
+  copy.textContent = "Copied!";
+
+  setTimeout(() => {
+    copy.textContent = "Copy";
+  }, 1500);
+
+});
+
+</script>
+
+</body>
+</html>
