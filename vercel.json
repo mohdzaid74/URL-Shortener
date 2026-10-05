@@ -1,13 +1,12 @@
 {
-  "version": 2,
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
-    { "source": "/shorten", "destination": "/api" },
-    { "source": "/api/:path*", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/public/index.html" }
+    {
+      "source": "/",
+      "destination": "/public/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
   ]
 }
